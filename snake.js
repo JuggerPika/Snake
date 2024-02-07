@@ -1,4 +1,3 @@
-
 class Snake{
     constructor(x,y,size){
         this.x = x
@@ -52,7 +51,7 @@ class Apple{
                 }
             }
             this.size = snake.size
-            this.color = 'yellow'
+            this.color = 'green'
             if(!isTouching){
                 break;
             }    
@@ -60,27 +59,27 @@ class Apple{
     }
 }
 
-// class Bomb{
-//     constructor(){
-//         var isTouching;
-//         while(true){
-//             isTouching = false;
-//             this.x = Math.floor(Math.random() * canvas.width / snake.size) * snake.size
-//             this.y = Math.floor(Math.random() * canvas.height / snake.size) * snake.size
-//             for(var i = 0; i < snake.tail.length; i--){
-//                 if(this.x == snake.tail[i].x && this.y == snake.tail[i].y){
-//                     isTouching = true
-//                 }
-//             }
+class Bomb{
+    constructor(){
+        var isTouching;
+        while(true){
+            isTouching = false;
+            this.x = Math.floor(Math.random() * canvas.width / snake.size) * snake.size
+            this.y = Math.floor(Math.random() * canvas.height / snake.size) * snake.size
+            for(var i = 0; i < snake.tail.length; i++){
+                if(this.x == snake.tail[i].x && this.y == snake.tail[i].y){
+                    isTouching = true
+                }
+            }
 
-//             this.size = snake.size
-//             this.color = 'red'
-//             if(!isTouching){
-//                 break;
-//             }
-//         }
-//     }
-// }
+            this.size = snake.size
+            this.color = 'red'
+            if(!isTouching){
+                break;
+            }
+        }
+    }
+}
 
 
 var canvas = document.getElementById("canvas")
@@ -89,7 +88,7 @@ var snake = new Snake(20,20,20)
 
 var apple = new Apple()
 
-// var bomb = new Bomb()
+var bomb = new Bomb()
 
 var canvasContext = canvas.getContext('2d');
 
@@ -110,8 +109,15 @@ function update(){
     canvasContext.clearRect(0,0, canvas.width, canvas.height)
     snake.move()
     eatApple()
-    // eatBomb()
-    checkHitWall();
+    eatBomb()
+    checkHitWall()
+    checkLife()
+}
+
+function checkLife(){
+    if(snake.tail <= 0){
+        console.log('lose')
+    }
 }
 
 function checkHitWall(){
@@ -127,34 +133,38 @@ function checkHitWall(){
     }
 }
 
-// function eatBomb(){
-//     if(snake.tail[snake.tail.length - 1].x == bomb.x &&
-//         snake.tail[snake.tail.length - 1].y == bomb.y){
-//             snake.tail[snake.tail.length] = {x:bomb.x, y:bomb.y}
-//             bomb = new Bomb();
-//         }
-// }
+function eatBomb(){
+    if(snake.tail[snake.tail.length - 1].x == bomb.x &&
+        snake.tail[snake.tail.length - 1].y == bomb.y){
+            console.log(snake.tail)
+            snake.tail[snake.tail.length] = {x:bomb.x, y:bomb.y}
+            snake.tail[snake.tail.splice(-2)]
+            bomb = new Bomb();
+        }
+}
 
 function eatApple(){
     if(snake.tail[snake.tail.length - 1].x == apple.x && 
         snake.tail[snake.tail.length - 1].y == apple.y){
             snake.tail[snake.tail.length] = {x:apple.x, y: apple.y}
+            
             apple = new Apple(); 
         }
 }
 
 function draw(){
-    createRect(0,0, canvas.width, canvas.height, 'grey')
+    createRect(0,0, canvas.width, canvas.height, 'white')
     createRect(0,0, canvas.width, canvas.height)
     for(var i = 0; i < snake.tail.length; i++){
         createRect(snake.tail[i].x + 2.5, snake.tail[i].y + 2.5,
-            snake.size - 5, snake.size - 5, 'white')
+            snake.size - 5, snake.size - 5, 'green')
     }
 
-    canvasContext.font = '20px Roboto'
-    canvasContext.fillStyle = 'white'
+    canvasContext.font = '24px Roboto'
+    canvasContext.fillStyle = 'black'
     canvasContext.fillText('Score: ' +  (snake.tail.length -1), canvas.width -100,18);
     createRect(apple.x, apple.y, apple.size, apple.size, apple.color)
+    createRect(bomb.x, bomb.y, bomb.size, bomb.size, bomb.color)
 }
 
 function createRect(x,y,width,height,color){
